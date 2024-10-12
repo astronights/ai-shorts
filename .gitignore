@@ -5,8 +5,12 @@ __pycache__/
 build/
 dist/
 
-# Flask stuff:
+# Environment
+/shorts
 
+# Data
+*.jpg
+*.mp3
 
 # Jupyter Notebook
 .ipynb_checkpoints
