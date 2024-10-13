@@ -1,23 +1,45 @@
 from .prompts import prompt
+from .trends import get_searches
+from .llm import get_text
+from .media import download_image
+
+import os
+from uuid import uuid4
 
 from flask import Blueprint, current_app as app
-import requests
 
 instagram = Blueprint('instagram', __name__)
 
 @instagram.route('/daily', methods=['POST'])
 def generate_daily():
-    return 'To Be Implemented'
+    trend_url = app.config['TREND_URL']
+    topics = get_searches(trend_url)
+    
+    for topic in topics:
+        llm_prompt = prompt.format(topic=topic, country='worldwide')
+        prompts = get_text(llm_prompt)
+
+        return prompts
     
 
 @instagram.route('/trend/<trend>', methods=['POST'])
-def edit_caption(trend):
+def get_trend(trend):
 
-    
-    url = f"{app.config['IG_GRAPH_API_URL']}/{media_id}"
-    payload = {'caption': new_caption}
-    params = {'access_token': access_token, 'comment_enabled': True}
+    w, h = app.config['WIDTH'], app.config['HEIGHT']
+    IMAGE_URI = app.config['POLLINATION_URL'] + '/{prompt}' + f'?width={w}&height={h}&seed=42'
+    SAVE_DIR = app.config['TMP_DIR']
 
-    response = requests.post(url, params=params, data=payload)
+    topic = trend.split('_')
 
-    return response.json()
+    llm_prompt = prompt.format(topic=topic, country='worldwide')
+    prompts = get_text(llm_prompt)
+
+    video_descs = [e['description'] for e in prompts['video']]
+
+    medias = []
+    for i, desc in enumerate(video_descs):
+        key = f'video_{i}_{uuid4()}'
+        path = download_image(desc, key, IMAGE_URI, SAVE_DIR)
+        medias.append(os.path.basename(path))
+
+    return {'text': prompts, 'images': medias}

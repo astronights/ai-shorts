@@ -8,6 +8,8 @@ class CredentialConfig:
 class ContentConfig:
     WIDTH = 1080
     HEIGHT = 1920
+    TMP_DIR = os.getenv('TMP_DIR', '')
     
 class URLConfig:    
-    POLLINATION_URL = 'https://pollinations.ai/p/'
+    TREND_URL = 'https://trends.google.com/trends/api/dailytrends'
+    POLLINATION_URL = 'https://pollinations.ai/p'
