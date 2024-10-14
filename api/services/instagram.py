@@ -6,7 +6,7 @@ from .media import download_image
 import os
 from uuid import uuid4
 
-from flask import Blueprint, current_app as app
+from flask import Blueprint, request, current_app as app
 
 instagram = Blueprint('instagram', __name__)
 
@@ -40,6 +40,6 @@ def get_trend(trend):
     for i, desc in enumerate(video_descs):
         key = f'video_{i}_{uuid4()}'
         path = download_image(desc, key, IMAGE_URI, SAVE_DIR)
-        medias.append(os.path.basename(path))
+        medias.append(f'{request.host_url}serving/image/{os.path.basename(path)}')
 
     return {'text': prompts, 'images': medias}
